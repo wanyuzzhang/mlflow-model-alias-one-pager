@@ -58,28 +58,28 @@ flowchart LR
     end
 
     subgraph DO["2. SQL data objects and service projection"]
-        DO_MODEL["DbRegisteredModel<br/>Aliases: ICollection&lt;DbRegisteredModelAlias&gt;"]
+        DO_MODEL["DbRegisteredModel<br/>Aliases collection of DbRegisteredModelAlias"]
         DO_VERSION["DbModelVersion<br/>ModelVersionId + Version<br/>RegisteredModel"]
         DO_ALIAS["DbRegisteredModelAlias target shape<br/>TenantId + WorkspaceId + ModelId<br/>AliasNormalized + ModelVersionId"]
         SERVICE["NativeRegisteredModelServiceManager<br/>authorize + canonicalize + join/project<br/>atomic set/reassign/delete<br/>backend flight: MLEnableAlias"]
     end
 
     subgraph DTO["3. MLflow contract DTOs"]
-        DTO_REGISTERED["RegisteredModel<br/>Aliases: Dictionary&lt;string,string&gt;<br/>alias -&gt; version string"]
-        DTO_VERSION["ModelVersion<br/>Aliases: IEnumerable&lt;string&gt;<br/>persisted aliases targeting this version"]
+        DTO_REGISTERED["RegisteredModel<br/>Aliases dictionary<br/>alias maps to version string"]
+        DTO_VERSION["ModelVersion<br/>Aliases string list<br/>persisted aliases targeting this version"]
         DTO_GET_MODEL["GetRegisteredModelOutput<br/>registered_model: RegisteredModel"]
         DTO_GET_ALIAS["GetModelVersionByAliasOutput<br/>model_version: ModelVersion"]
-        DTO_MUTATE["SetRegisteredModelAliasInput<br/>{ name, alias, version }<br/><br/>DeleteRegisteredModelAliasInput<br/>{ name, alias }"]
+        DTO_MUTATE["SetRegisteredModelAliasInput<br/>fields: name, alias, version<br/><br/>DeleteRegisteredModelAliasInput<br/>fields: name, alias"]
     end
 
     subgraph JSON["4. Serialized MLflow JSON"]
-        JSON_MODEL["registered_model.aliases<br/>{ &quot;champion&quot;: &quot;5&quot;, &quot;baseline&quot;: &quot;3&quot; }"]
-        JSON_VERSION["model_version.aliases<br/>[ &quot;champion&quot;, &quot;production&quot; ]"]
+        JSON_MODEL["registered_model.aliases<br/>champion maps to 5<br/>baseline maps to 3"]
+        JSON_VERSION["model_version.aliases<br/>champion, production"]
         JSON_MUTATE["POST /registered-models/alias<br/>DELETE /registered-models/alias"]
     end
 
     subgraph FE["5. trident-de-ds-app entities"]
-        FE_MODEL["Registered Model FE entity<br/>aliases?: Record&lt;string,string&gt;<br/>model-level source of truth"]
+        FE_MODEL["Registered Model FE entity<br/>optional alias-to-version record<br/>model-level source of truth"]
         FE_VERSION["ModelVersionInterface<br/>aliases?: string[]<br/>version-row projection"]
         FE_UI["Properties card + right-side panel<br/>Version table + Notebook Alias column<br/>frontend flight: MLModelAliasUX"]
     end
